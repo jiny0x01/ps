@@ -1,11 +1,14 @@
 #include <iostream>
 using namespace std;
 
-int dp[102]{0,1,1,1,2,2,3,4,5,7,9,12};
+int dp[102] = {0,1,1,1,2,2,3,4,5,7,9};
 
 int solve(int n) {
 	if (dp[n]) return dp[n];
-	return dp[n] = solve(n-1) + solve(n-)
+	// 6th = 5th + 1th
+	// 7th = 6th + 2th
+	// nth = n-1th + 5th
+	return dp[n] = solve(n-1) + solve(n-5);
 }
 
 int main(int argc, char *argv[])
