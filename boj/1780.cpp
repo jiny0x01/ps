@@ -4,46 +4,58 @@
 using namespace std;
 
 
-void divide(const vector<vector<int>>& v, array<int, 3>&  r, int n, int x, int y)
+bool is_same_paper(const vector<vector<int>>& v, int n, int nx, int ny)
 {
-	bool equal = true;
-	int t = v[y][x];
-
-	for (int i = y; i > y-n; i--) {
-		for(int j = x; j > x-n; j--) {
-			if (t != v[i][j]) {
-				equal = false;
-				break;
-			}	
-		}
-		if (!equal)
-			break;
-	}
-
-	if (equal) { // 다 똑같으면
-		r[t+1]++;
-//		cout << "n:" << n << "entry x:" << x << ", y:" << y << ", value:" << t <<  endl;
-	} else { // 종이 쪼개기 
-		for (int i = 1; i <= 3; i++)  {
-			for(int j = 1; j <= 3; j++) {
-				if (n>=9) {
-					// y값 수정필요
-					divide(v, r, n/3, x/3 * i, y*j/3);	
-				} else {
-					int t = v[y-i+1][x-j+1];	
-					r[t+1]++;
-				}
+	int base = v[ny][nx];
+	for(int i = ny-n+1; i <= ny; i++) {
+		for(int j = nx-n+1; j <= nx; j++) {
+			if (base != v[i][j]) {
+				return false;
 			}
 		}
 	}
+	return true;
 }
 
-void split_paper(const vector<vector<int>>& v, int n) 
+
+int paper_type[3];
+
+void split_paper(const vector<vector<int>>& v, int n, int nx, int ny) 
 {
-	array<int, 3> r{0,0,0};
-	divide(v, r,  n, n, n);
-	for(const auto& itr : r)
-		cout << itr << "\n";
+
+	/*
+	 1 2 3
+	 4 5 6
+	 7 8 9(n)
+	 */
+	if (is_same_paper(v, n, nx, ny)) {
+		paper_type[v[ny][nx]+1]++;
+		return;
+	}
+
+	// 3 3 6 
+	// 1 2 3
+	// 2  6 4 5 6
+
+	const int dx[9]{
+		nx - n/3*2, nx - n/3, nx,  // 1 2 3
+		nx - n/3*2, nx - n/3, nx,  // 4 5 6
+		nx - n/3*2, nx - n/3, nx,  // 7 8 9 
+	};
+	const int dy[9]{
+		ny - n/3*2, ny - n/3*2, ny - n/3*2,   // 1 2 3 
+		ny - n/3,	ny - n/3, 	ny - n/3, // 4 5 6
+		ny, 		ny, 		ny, 	// 7 8 9
+	};
+
+	// 3 3 6
+	// 1 2 3
+	// 2
+	// 4
+	// 6
+	for(int i = 0; i < 9; i++) {
+		split_paper(v, n/3, dx[i], dy[i]);
+	}
 }
 
 int main()
@@ -71,6 +83,9 @@ int main()
 	}
 	*/
 
-	split_paper(v, n);
+	split_paper(v,n,n,n);
+	for(int i = 0; i < 3; i++) {
+		cout << paper_type[i] << endl;
+	}
 	return 0;
 }
